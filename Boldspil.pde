@@ -4,14 +4,14 @@ PShape ball;
 PVector ballvel;
 PVector ballpos;
 PVector offset;
-float prevX;
-float prevY;
+float prevX, prevY;
+float prevXball, prevYball;
 float prevMouseX, prevMouseY;
 final int balldiameter = 50;
-float ballspeed, speed;
-
-float gravity = 9.82;
-float drag = 0.01;
+float speedball, speedmouse;
+float gravity = 5;
+float drag = 0.25;
+boolean gamereset = true;
 
 void setup() {
   frameRate(60);
@@ -32,8 +32,24 @@ void draw() {
   mouseSpeed();
   isTouchingVoid();
   reset();
+  startup();
 
+  textSize(16);
+  textAlign(LEFT, TOP);
   text("FPS: " + frameRate, 20, 40);
+}
+
+void startup()
+{
+  if (gamereset == true)
+  {
+    textSize(100);
+    textAlign(CENTER);
+    text("Tryk space for at starte", width/2, height/4);
+    if (key == 32) {
+      gamereset = false;
+    }
+  }
 }
 
 void ballmove()
@@ -48,20 +64,23 @@ void ballmove()
   }
   if (isDragging == false && ballWasTouched == true)
   {
-    ballpos.add(ballvel); // Update ball position based on velocity
+    ballpos.add(ballvel);
   }
 }
 
 void applyGravity() {
-  ballvel.y += gravity; // Apply gravity by incrementing the Y velocity
+  ballvel.y += gravity;
 }
 
 void applyDrag() {
-  PVector dragForce = ballvel.copy(); // Create a copy of the velocity
-  dragForce.mult(-1);  // Reverse the direction to create drag force
-  dragForce.normalize(); // Normalize to get the direction
-  dragForce.mult(drag); // Scale by the drag coefficient
-  ballvel.add(dragForce); // Apply drag force to the velocity
+  PVector dragForce = ballvel.copy();
+  dragForce.mult(-1);
+  dragForce.normalize();
+  dragForce.mult(drag);
+  if (ballvel.x != 0 || ballvel.y != 0)
+  {
+    ballvel.add(dragForce);
+  }
 }
 
 void mousePressed() {
@@ -81,15 +100,23 @@ void mouseReleased() {
 
 void isTouchingVoid()
 {
-  if (ballpos.x >= width || ballpos.x <= 0)
+  if (ballpos.x >= width)
+  {
     ballvel.x = -ballvel.x;
+    ballpos.x = width-balldiameter/2;
+  }
+  if (ballpos.x <= 0)
+  {
+    ballvel.x = -ballvel.x;
+    ballpos.x = balldiameter/2;
+  }
   if (ballpos.y >= height - balldiameter / 2) {
     ballvel.y = -ballvel.y;
     ballpos.y = height - balldiameter / 2;
   }
   if (ballpos.y <= 0) {
     ballvel.y = -ballvel.y;
-    ballpos.y = 0;
+    ballpos.y = balldiameter/2;
   }
 }
 
@@ -101,16 +128,18 @@ void reset()
       ballvel.set(0, 0);
       ballWasTouched = false;
       isDragging = false;
+      gamereset = true;
     }
   }
 }
 
 void mouseSpeed()
 {
-  speed = dist(prevX, prevY, mouseX, mouseY);
+  speedmouse = dist(prevX, prevY, mouseX, mouseY);
   fill(255);
   textSize(16);
-  text("Mouse Speed: " + (speed*60) + "pixels/s", 20, 20);
+  textAlign(LEFT, TOP);
+  text("Mouse Speed: " + (speedmouse*frameRate) + "pixels/s", 20, 20);
   prevX = mouseX;
   prevY = mouseY;
 }
