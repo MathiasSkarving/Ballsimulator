@@ -12,6 +12,7 @@ final int balldiameter = 50;
 float speedball, speedmouse;
 float gravity = 9.82;
 float drag = 0.75;
+float energyconserved = 0.77;
 boolean gamereset = true;
 
 void setup() {
@@ -21,13 +22,11 @@ void setup() {
   ballpos = new PVector(width/2, height/2);
   ballvel = new PVector(0, 0);
   ball = createShape(ELLIPSE, 0, 0, balldiameter, balldiameter);
-  shape(ball);
 }
 
 void draw() {
   background(0);
   shape(ball, ballpos.x, ballpos.y);
-
   applyGravity();
   applyDrag();
   ballmove();
@@ -56,15 +55,17 @@ void basket()
 
 void ballmove()
 {
-  if (isDragging == true && ballWasTouched == true)
+  if (isDragging == true && ballWasTouched == true && gamereset == false)
   {
     ballvel = new PVector(-prevMouseX+mouseX, -prevMouseY+mouseY);
     ballvel.normalize();
     ballvel.mult(speedmouse);
     ballpos.x = offset.x+mouseX;
     ballpos.y = offset.y+mouseY;
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
   }
-  if (isDragging == false && ballWasTouched == true)
+  if (isDragging == false && ballWasTouched == true && gamereset == false)
   {
     ballpos.add(ballvel);
   }
@@ -76,23 +77,17 @@ void applyGravity() {
 
 void applyDrag() {
   PVector dragForce = ballvel.copy();
-  dragForce.mult(-1);
   dragForce.normalize();
-  dragForce.mult(drag);
-  if (ballvel.x != 0 || ballvel.y != 0)
-  {
-    ballvel.add(dragForce);
-  }
+  dragForce.mult(-drag);
+  ballvel.add(dragForce);
 }
 
 void mousePressed() {
   float d = dist(mouseX, mouseY, ballpos.x, ballpos.y);
-  if (d <= balldiameter / 2) {
+  if (d <= balldiameter / 2 && gamereset == false) {
     isDragging = true;
     ballWasTouched = true;
     offset = new PVector(ballpos.x-mouseX, ballpos.y-mouseY);
-    prevMouseX = mouseX;
-    prevMouseY = mouseY;
   }
 }
 
@@ -105,19 +100,23 @@ void isTouchingVoid()
   if (ballpos.x >= width)
   {
     ballvel.x = -ballvel.x;
+    ballvel.x *= energyconserved;
     ballpos.x = width-balldiameter/2;
   }
   if (ballpos.x <= 0)
   {
     ballvel.x = -ballvel.x;
+    ballvel.x *= energyconserved;
     ballpos.x = balldiameter/2;
   }
   if (ballpos.y >= height - balldiameter / 2) {
     ballvel.y = -ballvel.y;
+    ballvel.y *= energyconserved;
     ballpos.y = height - balldiameter / 2;
   }
   if (ballpos.y <= 0) {
     ballvel.y = -ballvel.y;
+    ballvel.y *= energyconserved;
     ballpos.y = balldiameter/2;
   }
 }
