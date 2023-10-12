@@ -4,18 +4,20 @@ PShape ball;
 PVector ballvel;
 PVector ballpos;
 PVector offset;
+PVector gravityForce;
 float prevX, prevY;
 float prevXball, prevYball;
 float prevMouseX, prevMouseY;
 final int balldiameter = 50;
 float speedball, speedmouse;
-float gravity = 5;
-float drag = 0.25;
+float gravity = 9.82;
+float drag = 0.75;
 boolean gamereset = true;
 
 void setup() {
   frameRate(60);
   size(1600, 800);
+  gravityForce = new PVector(0, gravity);
   ballpos = new PVector(width/2, height/2);
   ballvel = new PVector(0, 0);
   ball = createShape(ELLIPSE, 0, 0, balldiameter, balldiameter);
@@ -33,10 +35,6 @@ void draw() {
   isTouchingVoid();
   reset();
   startup();
-
-  textSize(16);
-  textAlign(LEFT, TOP);
-  text("FPS: " + frameRate, 20, 40);
 }
 
 void startup()
@@ -54,16 +52,15 @@ void startup()
 
 void basket()
 {
-  
 }
 
 void ballmove()
 {
   if (isDragging == true && ballWasTouched == true)
   {
-    ballvel = new PVector(prevMouseX-mouseX, prevMouseY-mouseY);
-    stroke(255);
-    line(mouseX, mouseY, prevMouseX, prevMouseY);
+    ballvel = new PVector(-prevMouseX+mouseX, -prevMouseY+mouseY);
+    ballvel.normalize();
+    ballvel.mult(speedmouse);
     ballpos.x = offset.x+mouseX;
     ballpos.y = offset.y+mouseY;
   }
@@ -74,7 +71,7 @@ void ballmove()
 }
 
 void applyGravity() {
-  ballvel.y += gravity;
+  ballvel.add(gravityForce);
 }
 
 void applyDrag() {
