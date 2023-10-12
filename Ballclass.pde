@@ -1,4 +1,5 @@
 class Ball {
+  boolean gamereset = true;
   boolean isDragging = false;
   boolean ballWasTouched = false;
   PShape ball;
@@ -13,25 +14,28 @@ class Ball {
   float speedball, speedmouse;
   float gravity = 9.82;
   float drag = 0.75;
-  float energyconserved = 0.77;
-  boolean gamereset = true;
+  float energyconserved = 0.7;
 
-  Ball(int x, int y)
+  Ball()
   {
     gravityForce = new PVector(0, gravity);
-    ballpos = new PVector(x, y);
+    ballpos = new PVector(width/2, height/2);
     ballvel = new PVector(0, 0);
+    noStroke();
+    ball = createShape(ELLIPSE,0,0,balldiameter,balldiameter);
   }
 
   void update()
   {
-    background(0);
     shape(ball, ballpos.x, ballpos.y);
     applyGravity();
     applyDrag();
     ballmove();
     mouseSpeed();
     isTouchingVoid();
+    startup();
+    reset();
+    System.out.println(gamereset);
   }
 
   void ballmove()
@@ -63,7 +67,7 @@ class Ball {
     ballvel.add(dragForce);
   }
 
-  void mousePressed() {
+  void checkMousePressed() {
     float d = dist(mouseX, mouseY, ballpos.x, ballpos.y);
     if (d <= balldiameter / 2 && gamereset == false) {
       isDragging = true;
@@ -72,7 +76,7 @@ class Ball {
     }
   }
 
-  void mouseReleased() {
+  void checkMouseReleased() {
     isDragging = false;
   }
 
@@ -111,5 +115,32 @@ class Ball {
     text("Mouse Speed: " + (speedmouse*frameRate) + "pixels/s", 20, 20);
     prevX = mouseX;
     prevY = mouseY;
+  }
+
+  void startup()
+  {
+    if (gamereset == true)
+    {
+      textSize(100);
+      textAlign(CENTER);
+      text("Tryk space for at starte", width/2, height/4);
+      if (key == 32) {
+        gamereset = false;
+      }
+    }
+  }
+
+
+  void reset()
+  {
+    if (keyPressed) {
+      if (key == 'r' || key == 'R') {
+        ballpos.set(width/2, height/2);
+        ballvel.set(0, 0);
+        ballWasTouched = false;
+        isDragging = false;
+        gamereset = true;
+      }
+    }
   }
 }
