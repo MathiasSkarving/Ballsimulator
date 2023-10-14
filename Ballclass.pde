@@ -13,8 +13,8 @@ class Ball {
   final int balldiameter = 50;
   float speedball, speedmouse;
   float gravity = 9.82;
-  float drag = 0.75;
-  float energyconserved = 0.7;
+  float drag = 1;
+  float energyconserved = 0.78;
 
   Ball()
   {
@@ -22,7 +22,7 @@ class Ball {
     ballpos = new PVector(width/2, height/2);
     ballvel = new PVector(0, 0);
     noStroke();
-    ball = createShape(ELLIPSE,0,0,balldiameter,balldiameter);
+    ball = createShape(ELLIPSE, 0, 0, balldiameter, balldiameter);
   }
 
   void update()
@@ -67,7 +67,7 @@ class Ball {
     ballvel.add(dragForce);
   }
 
-  void checkMousePressed() {
+  void MousePressed() {
     float d = dist(mouseX, mouseY, ballpos.x, ballpos.y);
     if (d <= balldiameter / 2 && gamereset == false) {
       isDragging = true;
@@ -76,7 +76,7 @@ class Ball {
     }
   }
 
-  void checkMouseReleased() {
+  void MouseReleased() {
     isDragging = false;
   }
 
@@ -142,5 +142,10 @@ class Ball {
         gamereset = true;
       }
     }
+  }
+
+  float isTouching(Ball otherBall) {
+    float distance = dist(ballpos.x, ballpos.y, otherBall.ballpos.x, otherBall.ballpos.y);
+    return distance;
   }
 }
