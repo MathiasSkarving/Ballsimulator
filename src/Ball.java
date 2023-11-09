@@ -1,8 +1,9 @@
-class Ball {
-  boolean gamereset = true;
+import processing.core.*;
+
+public class Ball extends PApplet {
   boolean isDragging = false;
   boolean ballWasTouched = false;
-  PShape ball;
+  boolean gamereset = true;
   PVector ballvel;
   PVector ballpos;
   PVector offset;
@@ -10,32 +11,25 @@ class Ball {
   float prevX, prevY;
   float prevXball, prevYball;
   float prevMouseX, prevMouseY;
-  final int balldiameter = 50;
-  float speedball, speedmouse;
-  float gravity = 9.82;
+  final float balldiameter = 50;
+  float speedball;
   float drag = 1;
-  float energyconserved = 0.78;
+  float energyconserved = (float) 0.75;
+  float speedmouse;
 
   Ball()
   {
-    gravityForce = new PVector(0, gravity);
+    gravityForce = new PVector(0,(float) 9.82);
     ballpos = new PVector(width/2, height/2);
     ballvel = new PVector(0, 0);
-    noStroke();
-    ball = createShape(ELLIPSE, 0, 0, balldiameter, balldiameter);
   }
 
   void update()
   {
-    shape(ball, ballpos.x, ballpos.y);
     applyGravity();
     applyDrag();
     ballmove();
-    mouseSpeed();
     isTouchingVoid();
-    startup();
-    reset();
-    System.out.println(gamereset);
   }
 
   void ballmove()
@@ -54,6 +48,16 @@ class Ball {
     {
       ballpos.add(ballvel);
     }
+  }
+
+  void mouseSpeed() {
+    speedmouse = dist(prevX, prevY, mouseX, mouseY);
+    fill(255);
+    textSize(16);
+    textAlign(LEFT, TOP);
+    text("Mouse Speed: " + (speedmouse * frameRate) + "pixels/s", 20, 20);
+    prevX = mouseX;
+    prevY = mouseY;
   }
 
   void applyGravity() {
@@ -104,48 +108,5 @@ class Ball {
       ballvel.y *= energyconserved;
       ballpos.y = balldiameter/2;
     }
-  }
-
-  void mouseSpeed()
-  {
-    speedmouse = dist(prevX, prevY, mouseX, mouseY);
-    fill(255);
-    textSize(16);
-    textAlign(LEFT, TOP);
-    text("Mouse Speed: " + (speedmouse*frameRate) + "pixels/s", 20, 20);
-    prevX = mouseX;
-    prevY = mouseY;
-  }
-
-  void startup()
-  {
-    if (gamereset == true)
-    {
-      textSize(100);
-      textAlign(CENTER);
-      text("Tryk space for at starte", width/2, height/4);
-      if (key == 32) {
-        gamereset = false;
-      }
-    }
-  }
-
-
-  void reset()
-  {
-    if (keyPressed) {
-      if (key == 'r' || key == 'R') {
-        ballpos.set(width/2, height/2);
-        ballvel.set(0, 0);
-        ballWasTouched = false;
-        isDragging = false;
-        gamereset = true;
-      }
-    }
-  }
-
-  float isTouching(Ball otherBall) {
-    float distance = dist(ballpos.x, ballpos.y, otherBall.ballpos.x, otherBall.ballpos.y);
-    return distance;
   }
 }
